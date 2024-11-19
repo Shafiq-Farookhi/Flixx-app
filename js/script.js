@@ -1,6 +1,18 @@
 const global = {
  currentPage: window.location.pathname,
+ search: {
+  term: '',
+  type: '',
+  page: 1,
+  totalpages: 1
+ },
+ api: {
+  apiKey: 'b477b4b0a5fb1d11acb63ff11c18bab2',
+  apiUrl: 'https://api.themoviedb.org/3/'
+ }
 }
+
+
 
 // Display 20 most popular movies
 async function displayPopularMovies() {
@@ -206,6 +218,21 @@ function dispalyBackgroundImage(type, background_path) {
   }
 }
 
+// Search Movies/Shows
+async function search() {
+  const queryString = window.location.search;
+  const urlParams = new URLSearchParams(queryString);
+  global.search.type = urlParams.get('type');
+  global.search.term = urlParams.get('search-term');
+
+  if (global.search.term !== '' && global.search.term !== null) {
+    const results = await searchAPIData();
+    console.log(results);
+  }else {
+    showAlert('Please enter a search term');
+  }
+}
+
 // Display Slider movies
 
  async function displaySlider() {
@@ -256,18 +283,34 @@ async function fetchAPIData(endpoint) {
 
     // Register your key at https://www.themoviedb.org/settings/api and enter here
     // Only use this for development or very small projects. You should store key and make requests from a server
-    const API_KEY = 'b477b4b0a5fb1d11acb63ff11c18bab2';
-    const API_URL = 'https://api.themoviedb.org/3/';
+    const API_KEY = global.api.apiKey;
+    const API_URL = global.api.apiUrl;
 
     showSpinner();
 
-    const response = await fetch(`${API_URL}${endpoint}?api_key=${API_KEY}&language=en-US`);
+    const response = await fetch(`${API_URL}${endpoint}?api_key=${API_KEY}&language=en-US&query=${global.search.term}`);
 
     const data = await response.json();
 
     hideSpinner();
 
     return data;
+}
+
+// Make request to search
+async function searchAPIData() {
+  const API_KEY = global.api.apiKey;
+  const API_URL = global.api.apiUrl;
+
+  showSpinner();
+
+  const response = await fetch(`${API_URL}search/${global.search.type}?api_key=${API_KEY}&language=en-US`);
+
+  const data = await response.json();
+
+  hideSpinner();
+
+  return data;
 }
 
 function showSpinner() {
@@ -287,6 +330,18 @@ function highlightActiveLink() {
     });
 }
 
+
+// Show Alert
+function showAlert(message, className) {
+  const alertEL = document.createElement('div');
+  alertEL.classList.add('alert', className);
+  alertEL.appendChild(document.createTextNode(message));
+  document.querySelector('#alert').appendChild(alertEL);
+
+  setTimeout(() => {
+    alertEL.remove();
+  }, 3000);
+}
 
 function addCommasToNumber(number) {
   return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -311,7 +366,7 @@ function init() {
             displayShowDetails(); 
             break;   
         case '/search.html':
-            console.log('Search'); 
+            search();
             break;   
         default:
             break;
