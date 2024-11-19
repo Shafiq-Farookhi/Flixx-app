@@ -238,9 +238,8 @@ section h2 {
   margin-top: 20px;
 }
 
-.details-bottom {
-  background-color: blue;
-}
+/* .details-bottom {
+} */
 
 .details-bottom li {
   margin: 15px 0;
