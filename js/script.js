@@ -375,24 +375,60 @@ function initSwipper() {
   })
 }
 
-//  Fetch data from TMDB API
+// //  Fetch data from TMDB API
+// async function fetchAPIData(endpoint) {
+
+//     // Register your key at https://www.themoviedb.org/settings/api and enter here
+//     // Only use this for development or very small projects. You should store key and make requests from a server
+//     const API_KEY = global.api.apiKey;
+//     const API_URL = global.api.apiUrl;
+
+//     showSpinner();
+
+//     const response = await fetch(`${API_URL}${endpoint}?api_key=${API_KEY}&language=en-US`);
+
+//     const data = await response.json();
+
+//     hideSpinner();
+
+//     return data;
+// }
+
+
+document.getElementById('fetch-button').addEventListener('click', async () => {
+  const outputDiv = document.getElementById('output');
+
+  try {
+    // Show a loading message
+    outputDiv.innerHTML = '<p>Loading...</p>';
+
+    // Fetch data
+    const data = await fetchAPIData('./movie/500'); // Example endpoint (movie with ID 550)
+
+    // Display the fetched data
+    // outputDiv.innerHTML = `
+    //   <h2>${data.title}</h2>
+    //   <p>Release Date: ${data.release_date}</p>
+    //   <p>Overview: ${data.overview}</p>
+    // `;
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    outputDiv.innerHTML = '<p>Error fetching data. Please try again.</p>';
+  }
+});
+
+// Fetch API function (adjust as needed)
 async function fetchAPIData(endpoint) {
+  const API_KEY = global.api.apiKey;
+  const API_URL = global.api.apiUrl;
 
-    // Register your key at https://www.themoviedb.org/settings/api and enter here
-    // Only use this for development or very small projects. You should store key and make requests from a server
-    const API_KEY = global.api.apiKey;
-    const API_URL = global.api.apiUrl;
-
-    showSpinner();
-
-    const response = await fetch(`${API_URL}${endpoint}?api_key=${API_KEY}&language=en-US`);
-
-    const data = await response.json();
-
-    hideSpinner();
-
-    return data;
+  const response = await fetch(`${API_URL}${endpoint}?api_key=${API_KEY}&language=en-US`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch: ${response.status}`);
+  }
+  return await response.json();
 }
+
 
 // Make request to search
 async function searchAPIData() {
